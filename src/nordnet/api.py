@@ -9,8 +9,8 @@ from nordnet.models.accounts_info import AccountsInfoResponse
 class NordnetApi:
     def __init__(self) -> None:
         self.session = requests.Session()
-        self.session.cookies.set("cookie_consent", "necessary")
-        self.session.cookies.set("nntheme", '{"a11y":false,"dark":"AUTO","osPref":"LIGHT"}')
+        self.session.cookies["cookie_consent"] = "necessary"
+        self.session.cookies["nntheme"] = '{"a11y":false,"dark":"AUTO","osPref":"LIGHT"}'
         self.headers = {
             "Accept-Language": "en-US,en;q=0.5",
             "Cache-Control": "no-cache",
@@ -31,7 +31,7 @@ class NordnetApi:
         }
         self._base_url = "https://www.nordnet.dk"
 
-    def login(self, username: str, password: str):
+    def login(self, username: str, password: str) -> dict:
         self._obtain_vital_cookies()
         self._login_anon()
         return self._login_user(username, password)
@@ -70,7 +70,7 @@ class NordnetApi:
         )
         login_response.raise_for_status()
 
-    def _login_user(self, username: str, password: str):
+    def _login_user(self, username: str, password: str) -> dict:
         headers = {
             **self._json_headers,
             "Origin": self._base_url,

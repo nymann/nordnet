@@ -9,7 +9,7 @@ app = typer.Typer()
 def main(username: str, password: str) -> None:
     api = NordnetApi()
     api.login(username, password)
-    acc_dict = dict()
+    acc_dict = {}
     accounts = api.accounts()
     for acc in accounts:
         acc_dict[acc.accid] = acc.dict()
