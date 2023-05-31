@@ -5,6 +5,8 @@ import jwt
 import requests
 from requests.models import Response
 
+from nordnet.headers import Headers
+
 
 class NordnetSession:  # noqa: WPS214 (only 2 public methods)
     def __init__(self, username: str, password: str):
@@ -14,6 +16,7 @@ class NordnetSession:  # noqa: WPS214 (only 2 public methods)
         self._username = username
         self._session.cookies["cookie_consent"] = "necessary"
         self._session.cookies["nntheme"] = '{"a11y":false,"dark":"AUTO","osPref":"LIGHT"}'
+        self._headers = Headers()
 
     def get(self, url: str, protected: bool = True, **kwargs: Any) -> Response:
         if protected:
@@ -38,22 +41,9 @@ class NordnetSession:  # noqa: WPS214 (only 2 public methods)
         self._obtain_vital_cookies()
         self._login_user()
 
-    def _headers(self) -> dict:
-        return {
-            "Accept-Language": "en-US,en;q=0.5",
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "DNT": "1",
-            "Pragma": "no-cache",
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/113.0",
-        }
-
     def _obtain_vital_cookies(self) -> None:
         headers = {
-            **self._headers(),
+            **self._headers.base(),
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
             "Accept-Encoding": "gzip, deflate, br",
             "Sec-Fetch-User": "?1",
@@ -64,10 +54,7 @@ class NordnetSession:  # noqa: WPS214 (only 2 public methods)
 
     def _login_user(self) -> dict:
         headers = {
-            **self._headers(),
-            "Accept": "application/json",
-            "Referer": "https://www.nordnet.dk/",
-            "client-id": "NEXT",
+            **self._headers.json(),
             "Origin": self._base_url,
             "sub-client-id": "NEXT",
         }
