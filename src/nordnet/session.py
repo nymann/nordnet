@@ -21,21 +21,24 @@ class NordnetSession:  # noqa: WPS214 (only 2 public methods)
     def get(self, url: str, protected: bool = True, **kwargs: Any) -> Response:
         if protected:
             self._check_token()
-        response: requests.Response = self._session.get(self._base_url + url, **kwargs)
-        return response
+        return self._session.get(self._base_url + url, **kwargs)
 
-    def post(
+    def post(  # noqa: WPS211
         self,
         url: str,
         protected: bool = True,
-        data: Optional[dict] = None,
+        data: Optional[dict] = None,  # noqa: WPS110
         json: Optional[dict] = None,
         **kwargs: Any,
     ) -> Response:
         if protected:
             self._check_token()
-        response: requests.Response = self._session.post(self._base_url + url, data=data, json=json, **kwargs)
-        return response
+        return self._session.post(
+            self._base_url + url,
+            data=data,
+            json=json,
+            **kwargs,
+        )
 
     def _refresh_token(self) -> None:
         self._obtain_vital_cookies()
@@ -69,10 +72,11 @@ class NordnetSession:  # noqa: WPS214 (only 2 public methods)
         return auth_response.json()
 
     def _check_token(self) -> None:
-        token = self._session.cookies.get("NN-JWT")
+        token: Optional[str] = self._session.cookies.get("NN-JWT")  # type: ignore
         if token is None:
             self._refresh_token()
-            return self._check_token()
+            self._check_token()
+            return
         payload: dict[str, Any] = jwt.decode(
             token,
             algorithms=["HS256", "RS256"],

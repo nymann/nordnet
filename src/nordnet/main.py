@@ -15,8 +15,8 @@ def main(username: str, password: str) -> None:
         acc_dict[acc.accid] = acc
     accounts_info = api.accounts_info(accounts)
     for acc_info in accounts_info:
-        acc = acc_dict[acc_info.accid]
-        typer.echo(f"[{acc.type}]: {acc_info.equity.value} {acc_info.equity.currency}")
+        account = acc_dict[acc_info.accid]
+        typer.echo(f"[{account.type}]: {acc_info.equity.value} {acc_info.equity.currency}")
 
 
 if __name__ == "__main__":

@@ -11,19 +11,38 @@ class HttpHelper:
         self._session = session
         self._headers = Headers().base()
 
-    def get(self, url: str, extra_headers: Optional[dict] = None, allow_redirects=False, **kwargs: Any) -> Response:
-        if extra_headers:
-            headers = {**self._headers, **extra_headers}
-        else:
-            headers = self._headers
-        return self._session.get(url, headers=headers, allow_redirects=allow_redirects, **kwargs)
+    def get(
+        self,
+        url: str,
+        extra_headers: Optional[dict] = None,
+        allow_redirects: bool = False,
+        **kwargs: Any,
+    ) -> Response:
+        return self._session.get(
+            url,
+            headers=self._create_headers(extra_headers),
+            allow_redirects=allow_redirects,
+            **kwargs,
+        )
 
-    def post(self, url: str, extra_headers: Optional[dict] = None, json_data: dict = {}, **kwargs: Any) -> Response:
+    def post(
+        self,
+        url: str,
+        extra_headers: Optional[dict] = None,
+        json_data: Optional[dict] = None,
+        **kwargs: Any,
+    ) -> Response:
+        return self._session.post(
+            url,
+            headers=self._create_headers(extra_headers),
+            json=json_data,
+            **kwargs,
+        )
+
+    def _create_headers(self, extra_headers: Optional[dict] = None) -> dict:
         if extra_headers:
-            headers = {**self._headers, **extra_headers}
-        else:
-            headers = self._headers
-        return self._session.post(url, headers=headers, json=json_data, **kwargs)
+            return {**self._headers, **extra_headers}
+        return self._headers
 
 
 class HttpJsonHelper(HttpHelper):
