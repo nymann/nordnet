@@ -6,7 +6,7 @@ import requests
 from requests.models import Response
 
 
-class NordnetSession:
+class NordnetSession:  # noqa: WPS214 (only 2 public methods)
     def __init__(self, username: str, password: str):
         self._session: requests.Session = requests.Session()
         self._base_url = "https://www.nordnet.dk"
@@ -14,6 +14,25 @@ class NordnetSession:
         self._username = username
         self._session.cookies["cookie_consent"] = "necessary"
         self._session.cookies["nntheme"] = '{"a11y":false,"dark":"AUTO","osPref":"LIGHT"}'
+
+    def get(self, url: str, protected: bool = True, **kwargs: Any) -> Response:
+        if protected:
+            self._check_token()
+        response: requests.Response = self._session.get(self._base_url + url, **kwargs)
+        return response
+
+    def post(
+        self,
+        url: str,
+        protected: bool = True,
+        data: Optional[dict] = None,
+        json: Optional[dict] = None,
+        **kwargs: Any,
+    ) -> Response:
+        if protected:
+            self._check_token()
+        response: requests.Response = self._session.post(self._base_url + url, data=data, json=json, **kwargs)
+        return response
 
     def _refresh_token(self) -> None:
         self._obtain_vital_cookies()
@@ -75,22 +94,3 @@ class NordnetSession:
         )
         if payload["exp"] < time.time():
             self._refresh_token()
-
-    def get(self, url: str, protected: bool = True, **kwargs: Any) -> Response:
-        if protected:
-            self._check_token()
-        response: requests.Response = self._session.get(self._base_url + url, **kwargs)
-        return response
-
-    def post(
-        self,
-        url: str,
-        protected: bool = True,
-        data: Optional[Any] = None,
-        json: Optional[Any] = None,
-        **kwargs: Any,
-    ) -> Response:
-        if protected:
-            self._check_token()
-        response: requests.Response = self._session.post(self._base_url + url, data=data, json=json, **kwargs)
-        return response

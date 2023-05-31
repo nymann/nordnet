@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from requests import Response
 
@@ -20,12 +20,18 @@ class HttpHelper:
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/113.0",
         }
 
-    def get(self, url: str, headers: dict = {}, allow_redirects=False, **kwargs: Any) -> Response:
-        headers = {**self.headers, **headers}
+    def get(self, url: str, extra_headers: Optional[dict] = None, allow_redirects=False, **kwargs: Any) -> Response:
+        if extra_headers:
+            headers = {**self.headers, **extra_headers}
+        else:
+            headers = self.headers
         return self.session.get(url, headers=headers, allow_redirects=allow_redirects, **kwargs)
 
-    def post(self, url: str, headers: dict = {}, json_data: dict = {}, **kwargs: Any) -> Response:
-        headers = {**self.headers, **headers}
+    def post(self, url: str, extra_headers: Optional[dict] = None, json_data: dict = {}, **kwargs: Any) -> Response:
+        if extra_headers:
+            headers = {**self.headers, **extra_headers}
+        else:
+            headers = self.headers
         return self.session.post(url, headers=headers, json=json_data, **kwargs)
 
 
